@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcards & Cài đặt</title>
+  <link rel="stylesheet" href="popup.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Flashcards</h1>
+      <div class="header-actions">
+        <select id="modeSelect" class="mode-select" title="Chọn chế độ học">
+          <option value="1">Từ ➔ Nghĩa</option>
+          <option value="2">Giải nghĩa ➔ Từ</option>
+        </select>
+        <button id="manageBtn" class="icon-btn" title="Quản lý từ vựng">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+        <button id="settingsBtn" class="icon-btn" title="Cài đặt API Key">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="mainContent">
+      <!-- Loading state -->
+      <div id="loading" class="state-view active">
+        <div class="spinner"></div>
+      </div>
+
+      <!-- No words to review -->
+      <div id="emptyState" class="state-view">
+        <div class="empty-icon">🎉</div>
+        <h2>Chúc mừng!</h2>
+        <p>Bạn đã hoàn thành tất cả từ vựng hôm nay.</p>
+        <button id="reviewAllBtn" class="btn secondary-btn">Ôn tập toàn bộ</button>
+      </div>
+
+      <!-- Flashcard view -->
+      <div id="flashcardState" class="state-view">
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+        </div>
+        <div class="progress-text"><span id="reviewedCount">0</span> / <span id="totalReviewCount">0</span></div>
+        <div class="card">
+          <div class="word-container">
+            <h2 id="wordText">word</h2>
+            <button id="speakBtn" class="icon-btn speaker-btn" title="Nghe phát âm" style="display: none;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+            </button>
+          </div>
+          <div id="phoneticsContainer" class="phonetics-container" style="display: none;">
+             <button id="showPhoneticsBtn" class="reveal-btn">Hiển thị phiên âm</button>
+             <div id="phoneticsText" class="phonetics-text hidden"></div>
+          </div>
+          <div class="options" id="optionsContainer">
+            <!-- Buttons injected by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Management view -->
+      <div id="manageState" class="state-view">
+        <div class="manage-header">
+          <button id="backBtn" class="icon-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </button>
+          <h2>Từ vựng của bạn (<span id="totalWords">0</span>)</h2>
+        </div>
+        <ul id="wordList" class="word-list">
+          <!-- List injected by JS -->
+        </ul>
+      </div>
+
+      <!-- Settings view -->
+      <div id="settingsState" class="state-view">
+        <div class="settings-header">
+          <button id="settingsBackBtn" class="icon-btn" title="Quay lại">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </button>
+          <h2>Cấu hình Gemini API Key</h2>
+        </div>
+        
+        <div class="settings-body">
+          <div class="settings-help">
+            <p>Nhập <strong>1 hoặc nhiều API Key</strong> của Gemini (mỗi key một dòng hoặc cách nhau bằng dấu phẩy). Extension sẽ tự động xoay vòng để chống rate-limit.</p>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="settings-link" id="getKeyLink">
+              🔑 Lấy Gemini API Key miễn phí tại Google AI Studio ➔
+            </a>
+          </div>
+
+          <div class="form-group">
+            <div class="form-header">
+              <label for="apiKeyInput">Danh sách API Keys:</label>
+              <span id="apiKeyCountBadge" class="key-count-badge">0 key</span>
+            </div>
+            <textarea id="apiKeyInput" class="api-key-textarea" rows="4" placeholder="Dán 1 hoặc nhiều API Key vào đây...&#10;(Mỗi key 1 dòng hoặc cách nhau bằng dấu phẩy)"></textarea>
+          </div>
+
+          <div class="settings-actions">
+            <button id="saveSettingsBtn" class="btn primary-btn">💾 Lưu cấu hình</button>
+            <button id="testApiBtn" class="btn secondary-btn">⚡ Kiểm tra kết nối</button>
+          </div>
+
+          <div id="settingsStatusMsg" class="settings-status-msg"></div>
+          
+          <div id="testResultsSection" class="test-results-section hidden">
+            <h4>Kết quả kiểm tra:</h4>
+            <div id="testResultsList" class="test-results-list"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

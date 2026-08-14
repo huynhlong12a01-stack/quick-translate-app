@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Gemini Translator",
+  "version": "3.0.1",
+  "description": "Dịch văn bản bôi đen bằng Gemini API.",
+  "permissions": ["activeTab", "storage", "tts"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Flashcards"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}
